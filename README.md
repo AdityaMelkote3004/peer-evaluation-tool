@@ -13,14 +13,6 @@ Copy-paste this entire block into `README.md` (single markdown cell). These inst
 
 ---
 
-## Prerequisites
-- Node.js (v16+)
-- npm
-- Python 3.10+
-- Git
-- A database (Postgres / Supabase / SQLite)
-
----
 
 ## 1) Backend — Local development (PowerShell)
 
@@ -48,12 +40,9 @@ Copy-paste this entire block into `README.md` (single markdown cell). These inst
    - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
    - `SECRET_KEY`, etc.
 
-5. (Optional) Run migrations (if applicable):
-    
-    # Example if Alembic is configured
-    alembic upgrade head
 
-6. Start the backend (development):
+
+5. Start the backend (development):
     
     python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
@@ -121,84 +110,9 @@ You should only see `peer-eval/services/backend/.env.example` (and other non-sen
 
 ---
 
-## 6) Secrets — Rotate immediately (essential)
 
-If secrets were pushed, rotate them now (do this before or immediately after history purge):
 
-- Supabase:
-  - Dashboard → Project → Settings → API
-  - Revoke old ANON and SERVICE_ROLE keys; generate new keys
-  - Update local `services/backend/.env` (do NOT commit)
 
-- Database:
-  - Change DB password or create a new DB user
-  - Update `DATABASE_URL` / `ASYNC_DATABASE_URL` in local `.env` and deployment settings
-
-- CI / hosting:
-  - Update environment variables with the new secrets
-
----
-
-## 7) Purge `.env` from git history (optional, advanced)
-
-To remove secrets from all commits (rewrites history). **Do this from a mirror clone; rewriting history forces all collaborators to re-clone.**
-
-Recommended: `git-filter-repo`
-
-1. Install (if needed):
-
-    pip install git-filter-repo
-
-2. Create a mirror clone:
-
-    git clone --mirror https://github.com/AdityaMelkote3004/peer-evaluation-tool.git
-    Set-Location .\peer-evaluation-tool.git
-
-3. Remove the file from history:
-
-    git filter-repo --path peer-eval/services/backend/.env --invert-paths
-
-4. Force-push cleaned history:
-
-    git push --force --all
-    git push --force --tags
-
-Alternative: BFG Repo-Cleaner (similar effect). After rewrite: inform collaborators to re-clone:
-
-    git clone https://github.com/AdityaMelkote3004/peer-evaluation-tool.git
-
----
-
-## 8) Helpful git commands (quick)
-
-Stop tracking `.env` (if needed):
-
-    git rm --cached peer-eval/services/backend/.env
-    git add .gitignore
-    git commit -m "Stop tracking .env and add to .gitignore"
-    git push origin main
-
-Search history for `.env` occurrences (quick heuristic):
-
-    git log --all --pretty=format:%H --name-only | Select-String "peer-eval/services/backend/.env" -SimpleMatch
-
----
-
-## 9) Troubleshooting
-
-- Vite/Tailwind CSS `@import` error: ensure any `@import` is at the top of `src/index.css` or use `<link>` in `index.html`.
-- Backend 500 errors: check logs, verify `DATABASE_URL`, run migrations.
-- After history rewrite: do not `git pull`; re-clone the repo.
-- Fonts not showing: hard-refresh cache (Ctrl+Shift+R) or test in incognito mode.
-
----
-
-## 10) Next steps I can help with
-
-If you want, I can:
-- Generate a PowerShell script to perform the history purge (ready-to-run).
-- Perform the purge and force-push (I will not proceed without your confirmation).
-- Provide step-by-step rotation instructions for Supabase keys.
 - Add a `SECURITY.md` snippet documenting the rotation and notification steps.
 
 ---
