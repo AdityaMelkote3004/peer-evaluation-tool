@@ -1,201 +1,206 @@
-# Peer Evaluation — Run instructions
+# Peer Evaluation — Run & Cleanup Instructions
 
-Quick copy-paste guide to run this project locally on Windows (PowerShell).
-
-## Prerequisites
-- Node.js (v16+)
-- npm (or yarn/pnpm)
-- Python 3.10+
-- A database (Postgres / MySQL / SQLite) — configure via env
-
-## Repository layout
-- Frontend: services/frontend
-- Backend: services/backend
+Copy-paste this entire block into `README.md` (single markdown cell). These instructions cover running the project locally (Windows / PowerShell) and finishing secure cleanup of the accidentally committed `.env`.
 
 ---
 
-## Backend (FastAPI)
+## Repository layout
+- Frontend: `services/frontend` (React + Vite + Tailwind)
+- Backend: `services/backend` (FastAPI)
+- Example env: `services/backend/.env.example` (placeholders only — DO NOT commit secrets)
 
-1. Open PowerShell, create & activate a venv:
-```powershell
-cd "c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\peer-eval\services\backend"
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-```
+> IMPORTANT: A real `services/backend/.env` containing secrets was present in the repo history. That file has been removed from tracking and an `.env.example` added. Rotate any exposed secrets immediately (Supabase keys, DB password). See the "Secrets & Git history" section below.
 
-2. Install Python deps:
-```powershell
-pip install -r requirements.txt
-```
+---
 
-3. Create `.env` in the backend folder (example keys):
-```env
-# services/backend/.env
-DATABASE_URL=postgresql://user:pass@localhost:5432/peer_eval_db
-SECRET_KEY=your_secret_here
-```
+## Prerequisites
+- Node.js (v16+)
+- npm
+- Python 3.10+
+- Git
+- A database (Postgres / Supabase / SQLite)
 
-4. (Optional) Run DB migrations (if applicable):
-```powershell
-# adjust to your migrations tool (alembic/example)
-alembic upgrade head
-```
+---
 
-5. Start backend (development):
-```powershell
-python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-```
+## 1) Backend — Local development (PowerShell)
+
+1. Change to the backend folder:
+    
+    cd "c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\peer-eval\services\backend"
+
+2. Create & activate a Python virtual environment:
+    
+    python -m venv .venv
+    # Activate in PowerShell
+    .venv\Scripts\Activate.ps1
+
+3. Install Python dependencies:
+    
+    pip install -r requirements.txt
+
+4. Create a local `.env` from the example and edit it (DO NOT commit):
+    
+    Copy-Item .env.example .env
+    notepad .env   # add real values and save
+
+   Populate:
+   - `DATABASE_URL`, `ASYNC_DATABASE_URL`
+   - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+   - `SECRET_KEY`, etc.
+
+5. (Optional) Run migrations (if applicable):
+    
+    # Example if Alembic is configured
+    alembic upgrade head
+
+6. Start the backend (development):
+    
+    python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+
 Open API docs: http://127.0.0.1:8000/docs
 
 ---
 
-## Frontend (React + Vite)
+## 2) Frontend — Local development (PowerShell)
 
-1. Install dependencies:
-```powershell
-cd "c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\peer-eval\services\frontend"
-npm install
-```
+1. Change to the frontend folder:
+    
+    cd "c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\peer-eval\services\frontend"
 
-2. Start dev server:
-```powershell
-npm run dev
-```
-Open UI: http://localhost:3000
+2. Install dependencies:
+    
+    npm install
 
-Notes:
-- If you changed fonts via CSS imports and see a Vite/Tailwind error: ensure any `@import` statements are placed at the very top of `services/frontend/src/index.css` (before other rules) OR add the font `<link>` in `services/frontend/index.html` head.
-- If fonts don't appear, hard refresh (Ctrl+Shift+R) or clear cache.
+3. Start the dev server:
+    
+    npm run dev
 
----
-
-## Run both (recommended)
-Open two PowerShell windows/tabs and run backend and frontend commands in each.
-
-Optional small PowerShell helper (create `start-all.ps1` in repo root):
-```powershell
-# filepath: c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\start-all.ps1
-Start-Process powershell -ArgumentList "-NoExit","-Command","cd `\"c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\peer-eval\services\backend`\"; .venv\Scripts\Activate.ps1; python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000"
-Start-Process powershell -ArgumentList "-NoExit","-Command","cd `\"c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\peer-eval\services\frontend`\"; npm run dev"
-```
-
-Run it from PowerShell:
-```powershell
-.\start-all.ps1
-```
-
----
-
-## Production (brief)
-- Frontend: `npm run build` in services/frontend -> `dist/`
-- Backend: run uvicorn/gunicorn behind a reverse proxy (NGINX) on 0.0.0.0
-
----
-
-## Troubleshooting
-- Backend 500 errors: check backend terminal logs; verify `DATABASE_URL`, migrations, and `.env`.
-- Tailwind/Vite CSS error: "[@import must precede all other statements]" — move font `@import` to top of `src/index.css` or add the `<link>` to `index.html`.
-- Font not updating: hard refresh (Ctrl+Shift+R), clear cache, or verify font link is present in `services/frontend/index.html`.
-
-If you want, I can add a `.env.example`, a startup script for Windows, or fix the font import in your frontend files.
-```// filepath: c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\README.md
-# Peer Evaluation — Run instructions
-
-Quick copy-paste guide to run this project locally on Windows (PowerShell).
-
-## Prerequisites
-- Node.js (v16+)
-- npm (or yarn/pnpm)
-- Python 3.10+
-- A database (Postgres / MySQL / SQLite) — configure via env
-
-## Repository layout
-- Frontend: services/frontend
-- Backend: services/backend
-
----
-
-## Backend (FastAPI)
-
-1. Open PowerShell, create & activate a venv:
-```powershell
-cd "c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\peer-eval\services\backend"
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-```
-
-2. Install Python deps:
-```powershell
-pip install -r requirements.txt
-```
-
-3. Create `.env` in the backend folder (example keys):
-```env
-# services/backend/.env
-DATABASE_URL=postgresql://user:pass@localhost:5432/peer_eval_db
-SECRET_KEY=your_secret_here
-```
-
-4. (Optional) Run DB migrations (if applicable):
-```powershell
-# adjust to your migrations tool (alembic/example)
-alembic upgrade head
-```
-
-5. Start backend (development):
-```powershell
-python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-```
-Open API docs: http://127.0.0.1:8000/docs
-
----
-
-## Frontend (React + Vite)
-
-1. Install dependencies:
-```powershell
-cd "c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\peer-eval\services\frontend"
-npm install
-```
-
-2. Start dev server:
-```powershell
-npm run dev
-```
-Open UI: http://localhost:3000
+Open the UI: http://localhost:3000
 
 Notes:
-- If you changed fonts via CSS imports and see a Vite/Tailwind error: ensure any `@import` statements are placed at the very top of `services/frontend/src/index.css` (before other rules) OR add the font `<link>` in `services/frontend/index.html` head.
-- If fonts don't appear, hard refresh (Ctrl+Shift+R) or clear cache.
+- If you see a Vite/Tailwind CSS error: `@import must precede all other statements`, move any `@import` font lines to the very top of `services/frontend/src/index.css` OR add the font `<link>` in `services/frontend/index.html` head.
+- If fonts/CSS don't update, do a hard refresh (Ctrl+Shift+R) or use an incognito window.
 
 ---
 
-## Run both (recommended)
-Open two PowerShell windows/tabs and run backend and frontend commands in each.
+## 3) Run both simultaneously (optional)
 
-Optional small PowerShell helper (create `start-all.ps1` in repo root):
-```powershell
-# filepath: c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\start-all.ps1
-Start-Process powershell -ArgumentList "-NoExit","-Command","cd `\"c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\peer-eval\services\backend`\"; .venv\Scripts\Activate.ps1; python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000"
-Start-Process powershell -ArgumentList "-NoExit","-Command","cd `\"c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\peer-eval\services\frontend`\"; npm run dev"
-```
+Create `start-all.ps1` in the repo root containing:
 
-Run it from PowerShell:
-```powershell
-.\start-all.ps1
-```
+    Start-Process powershell -ArgumentList "-NoExit","-Command","cd `\"c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\peer-eval\services\backend`\"; .venv\Scripts\Activate.ps1; python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000"
+    Start-Process powershell -ArgumentList "-NoExit","-Command","cd `\"c:\Users\Lenovo\Documents\5th sem\se lab\mini-project\peer-eval\services\frontend`\"; npm run dev"
+
+Run it:
+
+    .\start-all.ps1
 
 ---
 
-## Production (brief)
-- Frontend: `npm run build` in services/frontend -> `dist/`
-- Backend: run uvicorn/gunicorn behind a reverse proxy (NGINX) on 0.0.0.0
+## 4) Production build (brief)
+
+Frontend:
+
+    cd services/frontend
+    npm run build
+    # deploy contents of services/frontend/dist
+
+Backend (example):
+
+    python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+    # run behind a reverse proxy (NGINX) in production
 
 ---
 
-## Troubleshooting
-- Backend 500 errors: check backend terminal logs; verify `DATABASE_URL`, migrations, and `.env`.
-- Tailwind/Vite CSS error: "[@import must precede all other statements]" — move font `@import` to top of `src/index.css` or add the `<link>` to `index.html`.
-- Font not updating: hard refresh (Ctrl+Shift+R), clear cache, or verify font link is present in `services/frontend/index.html`.
+## 5) Verify `.env` is NOT tracked locally
 
-If you want, I can add a `.env.example`, a startup script for Windows, or fix the font import in your frontend files.
+From repo root:
+
+    git ls-files | Select-String "\.env" -AllMatches | ForEach-Object { $_.ToString() }
+
+You should only see `peer-eval/services/backend/.env.example` (and other non-sensitive entries); `peer-eval/services/backend/.env` should NOT appear.
+
+---
+
+## 6) Secrets — Rotate immediately (essential)
+
+If secrets were pushed, rotate them now (do this before or immediately after history purge):
+
+- Supabase:
+  - Dashboard → Project → Settings → API
+  - Revoke old ANON and SERVICE_ROLE keys; generate new keys
+  - Update local `services/backend/.env` (do NOT commit)
+
+- Database:
+  - Change DB password or create a new DB user
+  - Update `DATABASE_URL` / `ASYNC_DATABASE_URL` in local `.env` and deployment settings
+
+- CI / hosting:
+  - Update environment variables with the new secrets
+
+---
+
+## 7) Purge `.env` from git history (optional, advanced)
+
+To remove secrets from all commits (rewrites history). **Do this from a mirror clone; rewriting history forces all collaborators to re-clone.**
+
+Recommended: `git-filter-repo`
+
+1. Install (if needed):
+
+    pip install git-filter-repo
+
+2. Create a mirror clone:
+
+    git clone --mirror https://github.com/AdityaMelkote3004/peer-evaluation-tool.git
+    Set-Location .\peer-evaluation-tool.git
+
+3. Remove the file from history:
+
+    git filter-repo --path peer-eval/services/backend/.env --invert-paths
+
+4. Force-push cleaned history:
+
+    git push --force --all
+    git push --force --tags
+
+Alternative: BFG Repo-Cleaner (similar effect). After rewrite: inform collaborators to re-clone:
+
+    git clone https://github.com/AdityaMelkote3004/peer-evaluation-tool.git
+
+---
+
+## 8) Helpful git commands (quick)
+
+Stop tracking `.env` (if needed):
+
+    git rm --cached peer-eval/services/backend/.env
+    git add .gitignore
+    git commit -m "Stop tracking .env and add to .gitignore"
+    git push origin main
+
+Search history for `.env` occurrences (quick heuristic):
+
+    git log --all --pretty=format:%H --name-only | Select-String "peer-eval/services/backend/.env" -SimpleMatch
+
+---
+
+## 9) Troubleshooting
+
+- Vite/Tailwind CSS `@import` error: ensure any `@import` is at the top of `src/index.css` or use `<link>` in `index.html`.
+- Backend 500 errors: check logs, verify `DATABASE_URL`, run migrations.
+- After history rewrite: do not `git pull`; re-clone the repo.
+- Fonts not showing: hard-refresh cache (Ctrl+Shift+R) or test in incognito mode.
+
+---
+
+## 10) Next steps I can help with
+
+If you want, I can:
+- Generate a PowerShell script to perform the history purge (ready-to-run).
+- Perform the purge and force-push (I will not proceed without your confirmation).
+- Provide step-by-step rotation instructions for Supabase keys.
+- Add a `SECURITY.md` snippet documenting the rotation and notification steps.
+
+---
+
+Paste this entire block into `README.md` — it is a single uninterrupted markdown cell ready for GitHub.
